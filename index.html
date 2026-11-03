@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f1216">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Reserva">
+<title>Reserva 4 semanas</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#0f1216;--card:#171b21;--card2:#1f242b;--line:#2a3039;--text:#e6e9ed;--mute:#97a0aa;--accent:#4fb3a9;--ok:#5cbf6b;--warn:#e0a63a;--bad:#e2665a;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+body{padding-bottom:calc(90px + env(safe-area-inset-bottom))}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px}
+input,select,textarea,button{font:inherit;color:inherit}
+input,select,textarea{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%;min-width:0;font-size:16px}
+button{cursor:pointer}
+.mute{color:var(--mute)}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+
+header.sum{padding:calc(14px + env(safe-area-inset-top)) 16px 10px}
+h1{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin:0 0 6px}
+.hrow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.hrow h1{margin:0}
+.big{display:flex;align-items:baseline;gap:8px}
+.big .n{font-size:46px;font-weight:700;line-height:1}
+.big .t{color:var(--mute)}
+.lim{color:var(--mute);font-size:13px;margin:4px 0 10px}
+.lim b{color:var(--text)}
+.pills{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pill{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.pill small{display:block;color:var(--mute);font-size:12px}
+.pill b{font-size:18px}
+.money{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:13px;color:var(--mute);margin-top:10px}
+.money b{color:var(--text)}
+.alerts{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.alert{background:#2a2216;border:1px solid #4a3a1c;color:#f0c97a;border-radius:8px;padding:7px 10px;font-size:13px;text-align:left;width:100%}
+
+.cita{display:block;width:100%;text-align:left;background:none;border:0;border-left:3px solid var(--accent);padding:4px 0 4px 12px;margin:2px 0 12px;color:var(--text);font-style:italic;font-size:14px}
+.cita small{display:block;font-style:normal;color:var(--mute);font-size:12px;margin-top:2px}
+nav.tabs{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;overflow-x:auto}
+nav.tabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;color:var(--mute);padding:12px 8px;font-weight:600;white-space:nowrap}
+nav.tabs button.on{color:var(--text);border-color:var(--accent)}
+
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 0}
+.full{grid-column:1/-1}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}
+.card p{margin:6px 0}
+h2{font-size:13px;color:var(--mute);text-transform:uppercase;letter-spacing:.05em;margin:18px 0 8px}
+.card h2:first-child{margin-top:0}
+
+.item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.item .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.item h3{margin:0;font-size:16px;line-height:1.3}
+.ed{background:none;border:1px solid var(--line);border-radius:8px;padding:3px 10px;color:var(--mute);font-size:13px;flex:0 0 auto}
+.sub{font-size:12px;color:var(--mute);margin-top:3px;display:flex;flex-wrap:wrap;gap:2px 12px}
+.imp{font-weight:600}.imp.i1{color:var(--bad)}.imp.i2{color:var(--warn)}
+.nota{font-size:12px;color:var(--mute);margin-top:4px}
+.qty{margin-top:8px;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px}
+.qty strong{font-size:18px}
+.qty span{font-size:13px}
+.bar{height:6px;background:var(--card2);border-radius:3px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:currentColor}
+.val{font-size:13px;margin-top:6px;color:var(--mute)}
+.val b{color:var(--text)}
+form.quick{display:flex;gap:6px;margin-top:10px;align-items:stretch}
+form.quick input{flex:1}
+form.quick select{width:auto;flex:0 0 auto}
+form.quick .ulab{align-self:center;color:var(--mute);font-size:13px;padding:0 2px}
+form.quick button{flex:0 0 48px;border-radius:8px;font-size:22px;font-weight:700;line-height:1}
+.b-add{background:var(--accent);color:#06201d;border:0}
+.b-sub{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+
+.btn{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.btn.pri{background:var(--accent);color:#06201d;border-color:var(--accent);font-weight:600}
+.btn.dan{color:var(--bad)}
+.btn.sm{padding:5px 10px;font-size:13px}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.tr{font-size:18px}
+.tr b{color:var(--accent)}
+.exc{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));background:#2b323b;border:1px solid var(--line);padding:10px 12px;border-radius:10px;display:flex;gap:12px;align-items:center;width:max-content;max-width:calc(100% - 32px);z-index:20;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.5)}
+
+dialog{background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:14px;padding:0;width:min(560px,calc(100% - 24px));max-height:calc(100% - 24px)}
+dialog::backdrop{background:rgba(0,0,0,.65)}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px}
+.fgrid.tight{padding:0}
+.fgrid label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mute)}
+.fgrid h3{margin:0}
+.hint{font-size:13px;color:var(--accent)}
+.dlg-actions{display:flex;gap:8px;padding:0 16px 16px}
+</style>
+</head>
+<body>
+<header class="sum wrap" id="sum"></header>
+<div class="wrap"><button id="cita" class="cita" aria-label="Otra frase"></button></div>
+<nav class="tabs" id="tabs"></nav>
+<main class="wrap" id="main"></main>
+<div id="toast" hidden></div>
+<input type="file" id="file" accept="application/json,.json" hidden>
+<datalist id="catlist"></datalist>
+
+<dialog id="dlg">
+<form id="fe" autocomplete="off">
+<div class="fgrid">
+  <h3 class="full" id="dlgT">Editar artículo</h3>
+  <label class="full">Nombre<input name="nombre" required></label>
+  <label>Categoría<input name="cat" list="catlist"></label>
+  <label>Importancia<select name="imp"><option value="1">Crítico</option><option value="2">Esencial</option><option value="3">Importante</option><option value="4">Útil</option></select></label>
+  <label>Unidad<select name="unidad"></select></label>
+  <label>Cantidad actual<input name="cant" type="number" step="any" min="0" inputmode="decimal"></label>
+  <label>Meta 4 semanas<input name="meta" type="number" step="any" min="0" inputmode="decimal"></label>
+  <label>Consumo diario en la emergencia<input name="diario" type="number" step="any" min="0" inputmode="decimal"></label>
+  <label>Consumo normal al día (para rotar)<input name="uso" type="number" step="any" min="0" inputmode="decimal" placeholder="0 = igual al de emergencia"></label>
+  <label class="full">Caducidad (la más próxima)<input name="cad" type="date"></label>
+  <label><span>Precio hoy <span data-ru="precio"></span></span><input name="precio" type="number" step="any" min="0" inputmode="decimal"></label>
+  <label>Multiplicador sem. 4<input name="mult" type="number" step="any" min="0" inputmode="decimal"></label>
+  <div class="full hint" id="v4"></div>
+  <label><span>Kcal <span data-ru="kcal"></span></span><input name="kcal" type="number" step="any" min="0" inputmode="decimal"></label>
+  <label>Cuenta en el resumen como<select name="rol"><option value="">—</option><option value="agua">Agua potable</option><option value="gas">Combustible</option></select></label>
+  <label class="full">Notas<textarea name="nota" rows="2"></textarea></label>
+</div>
+<div class="dlg-actions">
+  <button type="button" class="btn dan" id="del">Eliminar</button>
+  <span style="flex:1"></span>
+  <button type="button" class="btn" id="cancel">Cancelar</button>
+  <button class="btn pri">Guardar</button>
+</div>
+</form>
+</dialog>
+
+<script>
+'use strict';
+const KEY='reserva4s.v1';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,9);
+const r6=n=>Math.round(n*1e6)/1e6;
+
+// Unidades: [dimensión, factor respecto a la unidad de referencia de esa dimensión]
+const UNITS={g:['masa',.001],kg:['masa',1],ml:['vol',.001],L:['vol',1],'garrafón':['vol',20],pz:['pz',1],lata:['lata',1],paquete:['paquete',1],rollo:['rollo',1],sobre:['sobre',1],frasco:['frasco',1],caja:['caja',1],MXN:['MXN',1]};
+const REF={masa:'kg',vol:'L'};
+const PLUR={lata:'latas',paquete:'paquetes',rollo:'rollos',sobre:'sobres',frasco:'frascos',caja:'cajas','garrafón':'garrafones'};
+const ALIAS={};
+[['g','g gr grs gramo gramos'],['kg','kg kgs kilo kilos'],['ml','ml mililitro mililitros'],['L','l lt lts litro litros'],['garrafón','garrafon garrafones'],['pz','pz pza pzas pieza piezas'],['lata','lata latas'],['paquete','paquete paquetes paq'],['rollo','rollo rollos'],['sobre','sobre sobres'],['frasco','frasco frascos'],['caja','caja cajas'],['MXN','mxn peso pesos']]
+  .forEach(([u,s])=>s.split(' ').forEach(a=>ALIAS[a]=u));
+const norm=s=>String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const dim=u=>(UNITS[u]||[u])[0];
+const refU=u=>REF[dim(u)]||u;
+const compat=u=>Object.keys(UNITS).filter(k=>dim(k)===dim(u));
+function conv(n,from,to){if(from===to)return n;const a=UNITS[from],b=UNITS[to];if(!a||!b||a[0]!==b[0])return null;return n*a[1]/b[1];}
+const toRef=(n,u)=>conv(n,u,refU(u))??n;
+
+const nf=(n,d=2)=>Number(n).toLocaleString('es-MX',{maximumFractionDigits:d});
+const money=n=>'$'+Math.round(n).toLocaleString('es-MX');
+const pf=n=>n<10&&n%1?'$'+nf(n,2):money(n);
+function fq(n,u){
+  if(u==='MXN')return money(n);
+  if(u==='g'&&Math.abs(n)>=1000)return nf(n/1000)+' kg';
+  if(u==='ml'&&Math.abs(n)>=1000)return nf(n/1000)+' L';
+  return nf(n)+' '+(n!==1&&PLUR[u]?PLUR[u]:u);
+}
+function dUntil(s){if(!s)return null;const d=new Date(s+'T00:00'),t=new Date();t.setHours(0,0,0,0);return Math.round((d-t)/864e5);}
+function fAgo(ms){
+  const d=new Date(ms),t=new Date();
+  const days=Math.round((new Date(t.toDateString())-new Date(d.toDateString()))/864e5);
+  return days<=0?'hoy '+d.toLocaleTimeString('es-MX',{hour:'numeric',minute:'2-digit'}):days===1?'ayer':d.toLocaleDateString('es-MX',{day:'numeric',month:'short'});
+}
+const fDate=s=>new Date(s+'T00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});
+
+const CATS=['Agua','Comida','Combustible y cocina','Luz y energía','Salud','Higiene','Herramientas y seguridad','Efectivo y documentos','Niño'];
+
+// Lista sugerida para 1 adulto + 1 niño de 6 años, 28 días, ciudad de clima templado, cocina con estufa de campamento.
+// [id, categoría, nombre, unidad, meta, consumo diario (en la unidad), precio hoy por unidad de referencia (kg, L o pieza),
+//  multiplicador estimado a la semana 4, kcal por unidad de referencia, rol en el resumen, nota]
+const SEED=[
+ ['agua','Agua','Agua potable (garrafones y botellas)','L',140,5,2.5,8,0,'agua','5 L/día para beber y cocinar. Meta = 7 garrafones. Puedes sumar en "garrafón".'],
+ ['cisterna','Agua','Agua de cisterna (aseo y WC)','L',420,15,.15,15,0,'','No es potable sin tratar. Tapa con candado y no comentes cuánta tienes.'],
+ ['cloro','Agua','Cloro sin aroma','ml',2000,0,25,4,0,'','Potabilizar: 2 gotas por litro y esperar 30 min. Pierde fuerza en ~6 meses: rótalo.'],
+ ['filtro','Agua','Filtro de agua portátil','pz',1,0,600,3,0,'',''],
+ ['bomba','Agua','Bomba manual de sifón o cubeta con cuerda','pz',1,0,150,4,0,'','Sin luz la bomba no sube agua al tinaco: así sacas agua de la cisterna.'],
+ ['cubetas','Agua','Cubetas de 20 L con tapa','pz',3,0,90,3,0,'',''],
+ ['candado','Agua','Candado para la tapa de la cisterna','pz',1,0,150,2,0,'','Instálalo desde antes.'],
+
+ ['arroz','Comida','Arroz','g',4200,150,32,3,3600,'','~20 min de cocción: rinde el gas.'],
+ ['pasta','Comida','Pasta (sopa, espagueti)','g',2800,100,40,3,3600,'',''],
+ ['avena','Comida','Avena','g',2800,100,45,3,3800,'','Desayuno con muy poca cocción.'],
+ ['lentejas','Comida','Lentejas','g',1400,50,40,3,3500,'','25 min de cocción. Evita frijol seco (2–3 h de gas).'],
+ ['frijoles','Comida','Frijoles en lata (430 g)','lata',14,.5,24,3,390,'',''],
+ ['atun','Comida','Atún en lata','lata',14,.5,24,3.5,200,'',''],
+ ['sardinas','Comida','Sardinas en lata (425 g)','lata',7,.25,38,3,600,'',''],
+ ['leche','Comida','Leche en polvo','g',1400,50,220,4,5000,'','Prioridad para el niño.'],
+ ['aceite','Comida','Aceite vegetal','ml',1000,30,45,3,8800,'',''],
+ ['azucar','Comida','Azúcar','g',1200,40,30,4,4000,'','Muy buscada para trueque.'],
+ ['cacahuate','Comida','Crema de cacahuate','g',1200,40,120,3,5900,'','Mucha energía sin cocinar.'],
+ ['galletas','Comida','Galletas (Marías, saladas)','g',2800,100,60,3,4500,'',''],
+ ['maseca','Comida','Harina de maíz (tortillas)','g',3400,120,25,3,3600,'',''],
+ ['verduras','Comida','Verduras en lata (elote, chícharo, mixtas)','lata',14,.5,20,3,150,'',''],
+ ['fruta','Comida','Fruta en almíbar','lata',8,.3,35,3.5,250,'',''],
+ ['sal','Comida','Sal','g',500,5,15,2,0,'',''],
+ ['consome','Comida','Consomé de pollo en polvo','g',300,10,120,3,0,'',''],
+ ['cafe','Comida','Café soluble','g',200,5,500,5,0,'','Alto valor de trueque.'],
+ ['chocolate','Comida','Chocolate en polvo','g',400,15,100,4,3800,'','Para el ánimo del niño.'],
+ ['dulces','Comida','Dulces y premios para el niño','g',300,10,120,4,3800,'','También sirven para trueque.'],
+
+ ['butano','Combustible y cocina','Cartuchos de butano (227 g)','pz',16,.5,40,4,0,'gas','Cada uno ≈ 1.5–2 h de flama. Cocina solo en exterior o con buena ventilación.'],
+ ['estufa','Combustible y cocina','Estufa de campamento','pz',1,0,600,2,0,'','Ya la tienes: anótala con +1.'],
+ ['encendedor','Combustible y cocina','Encendedores','pz',3,0,15,5,0,'','Un encendedor desechable da miles de chispas: 3 alcanzan de sobra.'],
+ ['cerillos','Combustible y cocina','Cerillos','caja',4,0,10,5,0,'','Sustituyen a los encendedores. Si ya tienes 3 encendedores, son opcionales.'],
+ ['abrelatas','Combustible y cocina','Abrelatas manual','pz',2,0,60,4,0,'','Casi toda la proteína viene en lata.'],
+ ['olla','Combustible y cocina','Olla con tapa para la estufa','pz',1,0,300,2,0,'','Cocinar con tapa ahorra gas.'],
+ ['platos','Combustible y cocina','Platos desechables','pz',60,2,1.5,3,0,'','Ahorran agua de lavado.'],
+ ['vasos','Combustible y cocina','Vasos desechables','pz',60,2,1,3,0,'',''],
+ ['cubiertos','Combustible y cocina','Cubiertos desechables','pz',60,2,1,3,0,'',''],
+ ['aluminio','Combustible y cocina','Papel aluminio','rollo',1,0,40,2,0,'',''],
+
+ ['linterna','Luz y energía','Linterna de cabeza LED','pz',2,0,200,3,0,'',''],
+ ['lampara','Luz y energía','Lámpara LED de mesa (pilas o recargable)','pz',2,0,250,3,0,'',''],
+ ['aa','Luz y energía','Pilas AA','pz',24,.5,15,4,0,'',''],
+ ['aaa','Luz y energía','Pilas AAA','pz',12,.25,15,4,0,'',''],
+ ['powerbank','Luz y energía','Power bank 20,000 mAh','pz',2,0,450,3,0,'','Mantenlas cargadas desde antes.'],
+ ['solar','Luz y energía','Panel solar portátil USB','pz',1,0,900,3,0,'','Recarga power banks, lámparas y teléfono.'],
+ ['radio','Luz y energía','Radio de pilas o de manivela','pz',1,0,400,3,0,'','Noticias sin internet.'],
+ ['velas','Luz y energía','Velas','pz',15,.5,10,4,0,'','Nunca encendidas sin vigilancia.'],
+
+ ['paracetamol-inf','Salud','Paracetamol infantil (suspensión)','frasco',2,0,80,4,0,'','Dosis según el peso del niño.'],
+ ['paracetamol','Salud','Paracetamol adulto (tabletas)','pz',20,0,2,4,0,'',''],
+ ['ibuprofeno','Salud','Ibuprofeno (tabletas)','pz',20,0,2,4,0,'',''],
+ ['suero','Salud','Suero oral (sobres)','sobre',12,0,12,5,0,'','La diarrea es el riesgo principal con agua dudosa.'],
+ ['gasas','Salud','Gasas estériles','paquete',2,0,35,3,0,'','Para heridas y quemaduras.'],
+ ['curitas','Salud','Curitas','pz',40,0,2,3,0,'',''],
+ ['antiseptico','Salud','Antiséptico (yodopovidona o clorhexidina)','ml',120,0,750,3,0,'','Para limpiar heridas.'],
+ ['quemaduras','Salud','Pomada para quemaduras','pz',1,0,90,3,0,'','Riesgo real al cocinar con estufa de campamento.'],
+ ['vendas','Salud','Vendas elásticas','pz',3,0,25,3,0,'',''],
+ ['micropore','Salud','Cinta micropore','rollo',2,0,30,3,0,'',''],
+ ['antibiotica','Salud','Pomada antibiótica (neomicina)','pz',1,0,80,3,0,'',''],
+ ['guantes-desech','Salud','Guantes desechables','pz',20,0,3,3,0,'',''],
+ ['salina','Salud','Solución salina','ml',500,0,80,3,0,'','Lavar heridas y ojos.'],
+ ['tijeras','Salud','Tijeras de botiquín','pz',1,0,50,2,0,'',''],
+ ['pinzas','Salud','Pinzas de botiquín','pz',1,0,40,2,0,'','Para sacar astillas y espinas.'],
+ ['algodon','Salud','Algodón e hisopos','paquete',1,0,30,2,0,'',''],
+ ['loratadina','Salud','Antialérgico (loratadina)','caja',1,0,60,3,0,'',''],
+ ['termometro','Salud','Termómetro','pz',1,0,120,2,0,'',''],
+ ['vitaminas','Salud','Multivitamínico infantil','pz',28,1,4,3,0,'',''],
+ ['alcohol','Salud','Alcohol 70%','ml',500,0,60,3,0,'',''],
+
+ ['papel','Higiene','Papel higiénico','rollo',16,.5,10,4,0,'',''],
+ ['toallitas','Higiene','Toallitas húmedas (paquete de 80)','paquete',5,.15,45,4,0,'','Aseo sin agua.'],
+ ['gel','Higiene','Gel antibacterial','ml',1000,30,80,4,0,'',''],
+ ['jabon','Higiene','Jabón de barra','pz',4,0,15,3,0,'',''],
+ ['dental','Higiene','Pasta de dientes','pz',2,0,35,2,0,'',''],
+ ['cepillos','Higiene','Cepillos de dientes','pz',2,0,25,2,0,'',''],
+ ['bolsas','Higiene','Bolsas de basura grandes','pz',40,1,3,3,0,'','Sirven de baño de emergencia si no hay agua para el WC.'],
+
+ ['navaja','Herramientas y seguridad','Navaja multiusos','pz',1,0,300,2,0,'',''],
+ ['cinta','Herramientas y seguridad','Cinta adhesiva gris','rollo',1,0,80,3,0,'',''],
+ ['extintor','Herramientas y seguridad','Extintor pequeño','pz',1,0,500,2,0,'','Por la estufa y las velas.'],
+ ['cuerda','Herramientas y seguridad','Cuerda (15 m)','pz',1,0,80,2,0,'',''],
+ ['guantes','Herramientas y seguridad','Guantes de trabajo','pz',2,0,60,2,0,'',''],
+
+ ['efectivo','Efectivo y documentos','Efectivo en billetes chicos y monedas','MXN',4000,0,1,1,0,'','Sin luz no hay terminales ni cajeros. Billetes de $20 a $100.'],
+ ['doc-ine','Efectivo y documentos','Copia de INE','pz',1,0,0,1,0,'','Guarda todas las copias juntas en una bolsa hermética.'],
+ ['doc-actas','Efectivo y documentos','Copias de actas de nacimiento','pz',2,0,0,1,0,'','Tuya y del niño.'],
+ ['doc-curp','Efectivo y documentos','Copias de CURP','pz',2,0,0,1,0,'',''],
+ ['doc-polizas','Efectivo y documentos','Pólizas, recetas y datos médicos','pz',1,0,0,1,0,'','Seguro, cartilla de vacunación, alergias, tipo de sangre.'],
+ ['contactos','Efectivo y documentos','Lista de contactos en papel','pz',1,0,0,1,0,'',''],
+
+ ['juegos','Niño','Juegos de mesa y cartas','pz',3,0,150,1.5,0,'',''],
+ ['libros','Niño','Libros, cuadernos y colores','pz',1,0,200,1.5,0,'',''],
+ ['abrigo','Niño','Cobija extra','pz',2,0,300,2,0,'','Sin gas no hay calentador ni agua caliente.'],
+ ['ropa-nino','Niño','Ropa abrigadora del niño (suéter, pants, calcetines)','pz',3,0,250,2,0,'',''],
+];
+
+// Importancia: 1 crítico (sin esto la situación se vuelve peligrosa), 2 esencial, 3 importante, 4 útil.
+const IMP_L={1:'Crítico',2:'Esencial',3:'Importante',4:'Útil'};
+const IMP={
+  agua:1,cisterna:1,cloro:1,bomba:1,filtro:2,cubetas:2,candado:2,
+  arroz:1,avena:1,lentejas:1,frijoles:1,atun:1,leche:1,maseca:1,
+  pasta:2,sardinas:2,aceite:2,galletas:2,cacahuate:2,verduras:2,
+  azucar:3,sal:3,fruta:3,consome:3,chocolate:3,dulces:3,cafe:4,
+  butano:1,estufa:1,encendedor:1,abrelatas:1,cerillos:2,olla:2,platos:2,vasos:2,cubiertos:2,aluminio:4,
+  linterna:1,aa:1,lampara:2,aaa:2,powerbank:2,radio:2,solar:3,velas:3,
+  'paracetamol-inf':1,suero:1,gasas:1,curitas:1,antiseptico:1,quemaduras:1,
+  vendas:2,micropore:2,antibiotica:2,'guantes-desech':2,salina:3,tijeras:3,pinzas:3,algodon:4,paracetamol:2,ibuprofeno:2,termometro:2,alcohol:2,loratadina:3,vitaminas:3,
+  papel:1,toallitas:1,gel:1,jabon:1,bolsas:1,dental:2,cepillos:2,
+  extintor:2,navaja:3,cinta:4,cuerda:4,guantes:4,
+  efectivo:2,'doc-ine':2,'doc-actas':2,'doc-curp':3,'doc-polizas':3,contactos:3,
+  abrigo:2,'ropa-nino':2,juegos:3,libros:3,
+};
+const impOf=(v,id)=>IMP_L[+v]?+v:(IMP[id]||3);
+
+// Artículos que se aplican una sola vez (por su clave "k") al abrir la app: si el id ya existe se actualizan
+// esos campos, si no, se agrega como artículo nuevo. Este código es público: nunca pongas aquí el inventario
+// personal; eso se carga con "Agregar desde archivo".
+const MIO=[];
+// Cambios a la lista sugerida para datos ya guardados: quita ids viejos, actualiza nombre/metas/valores
+// de los que cambiaron (conservando cantidad y caducidad) y agrega los sugeridos nuevos que falten.
+const MIGRA=[
+  {k:'2026-11-02-botiquin',quitar:['botiquin'],
+   agregar:['gasas','curitas','antiseptico','quemaduras','vendas','micropore','antibiotica','guantes-desech','salina','tijeras','algodon']},
+  {k:'2026-11-02-dividir',quitar:['desechables','documentos'],
+   actualizar:['encendedor','chocolate','abrigo','tijeras'],
+   agregar:['cerillos','platos','vasos','cubiertos','dulces','cepillos','doc-ine','doc-actas','doc-curp','doc-polizas','ropa-nino','pinzas']},
+  {k:'2026-11-02-sustitutos',actualizar:['encendedor','cerillos']},
+];
+function aplicarMio(s){
+  s.aplicados=s.aplicados||[];
+  let n=0;
+  for(const {k,quitar=[],actualizar=[],agregar=[]} of MIGRA){
+    if(s.aplicados.includes(k))continue;
+    s.items=s.items.filter(i=>!quitar.includes(i.id));
+    for(const id of actualizar){
+      const ex=s.items.find(i=>i.id===id),row=SEED.find(r=>r[0]===id);
+      if(!ex||!row)continue;
+      const {nombre,meta,diario,precio,mult,kcal,nota,imp}=seedItem(row);
+      Object.assign(ex,{nombre,meta,diario,precio,mult,kcal,nota,imp});
+    }
+    const have=new Set(s.items.map(i=>i.id));
+    SEED.filter(r=>agregar.includes(r[0])&&!have.has(r[0])).forEach(r=>s.items.push(seedItem(r)));
+    s.aplicados.push(k);n++;
+  }
+  for(const {k,...raw} of MIO){
+    if(s.aplicados.includes(k))continue;
+    const ex=s.items.find(i=>i.id===raw.id);
+    if(ex)Object.assign(ex,cleanItem({...ex,...raw,upd:Date.now()}));
+    else s.items.push(cleanItem({...raw,upd:Date.now()}));
+    s.aplicados.push(k);n++;
+  }
+  return n;
+}
+// Sustitutos: artículos que cubren la misma necesidad. "m" da cuánto cubre cada uno por unidad de referencia
+// (kg, L o pieza); 'kcal' compara por calorías. "nec" es la necesidad total del grupo; si no se da, es la suma de las metas.
+// Lo que falta del grupo se reparte en el orden de "m": si el primero ya cubre todo, los demás ya no hacen falta.
+const GRUPOS=[
+  {nombre:'Para encender fuego',nec:3,m:{encendedor:1,cerillos:.5},txt:'1 caja de cerillos = ½ encendedor. Con 3 encendedores alcanza.'},
+  {nombre:'Leche',m:{leche:1,'leche-deslactosada':.125},txt:'1 L de leche líquida = 125 g de leche en polvo.'},
+  {nombre:'Luz',m:{linterna:1,lampara:1},txt:'Cualquier linterna o lámpara cuenta igual: 4 luces en total.'},
+  {nombre:'Analgésico adulto',nec:30,m:{paracetamol:1,ibuprofeno:1},txt:'Paracetamol e ibuprofeno se sustituyen: 30 tabletas en total.'},
+  {nombre:'Cereales y harinas',m:{arroz:'kcal',pasta:'kcal',avena:'kcal',maseca:'kcal'},txt:'Se comparan por calorías.'},
+  {nombre:'Legumbres',m:{frijoles:'kcal',lentejas:'kcal'},txt:'Se comparan por calorías.'},
+  {nombre:'Proteína en lata',m:{atun:'kcal',sardinas:'kcal'},txt:'Se comparan por calorías.'},
+];
+function sustitutos(){
+  const porItem={};
+  for(const g of GRUPOS){
+    const ms=Object.entries(g.m).map(([id,p])=>{const it=byId(id);if(!it)return null;const w=p==='kcal'?it.kcal:p;return w>0?{it,w}:null;}).filter(Boolean);
+    if(ms.length<2)continue;
+    const nec=g.nec??ms.reduce((s,x)=>s+toRef(x.it.meta,x.it.unidad)*x.w,0);
+    let resto=Math.max(0,nec-ms.reduce((s,x)=>s+toRef(x.it.cant,x.it.unidad)*x.w,0));
+    for(const x of ms){
+      const u=x.it.unidad,propia=Math.max(0,x.it.meta-x.it.cant);
+      const ef=Math.min(propia,conv(resto/x.w,refU(u),u)??resto/x.w);
+      resto=Math.max(0,resto-toRef(ef,u)*x.w);
+      porItem[x.it.id]={g,ef,propia,otros:ms.filter(y=>y!==x&&y.it.cant>0).map(y=>y.it.nombre)};
+    }
+  }
+  return {porItem};
+}
+let SUBS=null;
+const sub=()=>SUBS||(SUBS=sustitutos());
+// Lo que realmente falta comprar de un artículo, ya descontando sus sustitutos.
+function faltaDe(it){const si=sub().porItem[it.id];return si?si.ef:Math.max(0,it.meta-it.cant);}
+function redTxt(it){
+  const si=sub().porItem[it.id];
+  if(!si||si.propia<=1e-9||si.ef>=si.propia-1e-9||!si.otros.length)return '';
+  const por=si.otros.map(esc).join(', ');
+  return si.ef<=1e-9?`<span class="ok">✓ Cubierto con ${por}</span>`
+    :`<span class="ok">Por ${por}, te faltan ${fq(si.ef,it.unidad)} en vez de ${fq(si.propia,it.unidad)}</span>`;
+}
+
+function seedItem([id,cat,nombre,unidad,meta,diario,precio,mult,kcal,rol,nota]){return {id,cat,nombre,unidad,cant:0,meta,diario,precio,mult,kcal,rol,nota,cad:'',imp:impOf(null,id),upd:0,uso:0};}
+function fresh(){return {v:1,ajustes:{kcal:3600,agua:5,dias:28},ui:{tab:'inv',sort:'imp',cat:''},respaldo:null,items:SEED.map(seedItem)};}
+function cleanItem(i){
+  const n=v=>Number.isFinite(+v)?Math.max(0,+v):0;
+  return {id:String(i.id||uid()),cat:String(i.cat||'Otros'),nombre:String(i.nombre),unidad:UNITS[i.unidad]?i.unidad:'pz',
+    cant:n(i.cant),meta:n(i.meta),diario:n(i.diario),uso:n(i.uso),precio:n(i.precio),mult:i.mult==null?1:n(i.mult),kcal:n(i.kcal),
+    rol:['agua','gas'].includes(i.rol)?i.rol:'',nota:String(i.nota||''),cad:/^\d{4}-\d{2}-\d{2}$/.test(i.cad||'')?i.cad:'',imp:impOf(i.imp,i.id),upd:Number.isFinite(+i.upd)?+i.upd:0};
+}
+function cleanAjustes(a,base){
+  const out={...base};
+  for(const k of ['kcal','agua','dias']){const v=+(a||{})[k];if(Number.isFinite(v)&&v>0)out[k]=v;}
+  return out;
+}
+function load(){
+  try{
+    const s=JSON.parse(localStorage.getItem(KEY));
+    if(!s||!Array.isArray(s.items))return null;
+    s.ajustes=cleanAjustes(s.ajustes,{kcal:3600,agua:5,dias:28});
+    s.ui=Object.assign({tab:'inv',sort:'valor',cat:''},s.ui||{});
+    s.items=s.items.filter(i=>i&&i.nombre).map(cleanItem);
+    return s;
+  }catch(e){return null;}
+}
+function save(){SUBS=null;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){toast('No se pudo guardar en este navegador');}}
+
+let S=load()||fresh();
+if(aplicarMio(S))save();
+let q='';
+let editing=null;
+let importMode='imp';
+const byId=id=>S.items.find(i=>i.id===id);
+const allCats=()=>[...new Set([...CATS,...S.items.map(i=>i.cat)])];
+const catIx=c=>{const i=CATS.indexOf(c);return i<0?99:i;};
+const perecedero=it=>it.cat==='Comida'||it.cat==='Salud'||it.rol==='agua';
+
+// Rotación: con el consumo normal (o el diario si no hay), cuántos días tardas en usar lo que tienes.
+// "empieza" = días que faltan para empezar a consumirlo y que se acabe ROT_MARGEN días antes de caducar.
+const ROT_MARGEN=30;
+function calc(it){
+  const q=toRef(it.cant,it.unidad),cad=dUntil(it.cad);
+  const tasa=it.uso>0?it.uso:it.diario;
+  const rotD=tasa>0&&it.cant>0?Math.ceil(it.cant/tasa):null;
+  return {q,hoy:q*it.precio,s4:q*it.precio*it.mult,
+    dias:it.diario>0?it.cant/it.diario:null,
+    pct:it.meta>0?it.cant/it.meta:null,
+    cad,rotD,empieza:cad!=null&&rotD!=null?cad-rotD-ROT_MARGEN:null};
+}
+const enDias=n=>{const d=new Date();d.setDate(d.getDate()+n);return d.toLocaleDateString('es-MX',{month:'short',year:'numeric'});};
+
+const nn=v=>v==null?Infinity:v;
+const byName=(a,b)=>a.it.nombre.localeCompare(b.it.nombre,'es');
+const SORTS={
+  imp:['Importancia (críticos primero)',(a,b)=>a.it.imp-b.it.imp||nn(a.c.pct)-nn(b.c.pct)||byName(a,b)],
+  upd:['Última actualización (reciente primero)',(a,b)=>b.it.upd-a.it.upd||byName(a,b)],
+  valor:['Valor sem. 4 (total)',(a,b)=>b.c.s4-a.c.s4||b.it.mult-a.it.mult||byName(a,b)],
+  escasez:['Escasez sem. 4 (multiplicador)',(a,b)=>b.it.mult-a.it.mult||b.c.s4-a.c.s4||byName(a,b)],
+  cad:['Caducidad más próxima',(a,b)=>nn(a.c.cad)-nn(b.c.cad)||byName(a,b)],
+  rot:['Rotación (qué empezar a usar primero)',(a,b)=>nn(a.c.empieza??a.c.cad)-nn(b.c.empieza??b.c.cad)||byName(a,b)],
+  dias:['Días de cobertura (menos primero)',(a,b)=>nn(a.c.dias)-nn(b.c.dias)||byName(a,b)],
+  meta:['Avance de meta (menos primero)',(a,b)=>nn(a.c.pct)-nn(b.c.pct)||byName(a,b)],
+  cat:['Categoría',(a,b)=>catIx(a.it.cat)-catIx(b.it.cat)||byName(a,b)],
+  nombre:['Nombre',byName],
+};
+
+/* ---------- Resumen ---------- */
+// Grasas y dulces no pueden ser la base de la dieta: para los días de comida solo cuentan hasta su meta.
+const TOPE_KCAL=new Set(['aceite','azucar','dulces','chocolate','cacahuate']);
+function resumen(){
+  const A=S.ajustes;let kcal=0,agua=0,gas=0,hoy=0,s4=0,falta=0,cad=0,venc=0,rot=0;
+  for(const it of S.items){
+    const c=calc(it);
+    kcal+=(TOPE_KCAL.has(it.id)?Math.min(c.q,toRef(it.meta,it.unidad)):c.q)*it.kcal;
+    if(it.cant>0&&c.empieza!=null&&c.empieza<=60&&c.cad>=0)rot++;
+    if(it.rol==='agua'&&dim(it.unidad)==='vol')agua+=c.q;
+    if(it.rol==='gas'&&c.dias!=null)gas+=c.dias;
+    hoy+=c.hoy;s4+=c.s4;
+    falta+=toRef(faltaDe(it),it.unidad)*it.precio;
+    if(it.cant>0&&c.cad!=null){if(c.cad<0)venc++;else if(c.cad<=60)cad++;}
+  }
+  return {comida:kcal/A.kcal,agua:agua/A.agua,gas,hoy,s4,falta,cad,venc,rot};
+}
+function renderSum(){
+  const r=resumen(),D=S.ajustes.dias;
+  const parts=[['Agua potable',r.agua],['Comida',r.comida],['Gas',r.gas]];
+  const min=parts.reduce((a,b)=>b[1]<a[1]?b:a);
+  const ready=Math.floor(min[1]);
+  const cl=d=>d>=D?'ok':d>=D/2?'warn':'bad';
+  const al=[];
+  if(r.venc)al.push(`<button class="alert" data-go="cad">${r.venc} ${r.venc>1?'artículos ya caducaron':'artículo ya caducó'}: revisar</button>`);
+  if(r.rot)al.push(`<button class="alert" data-go="rot">${r.rot} ${r.rot>1?'artículos':'artículo'}: empieza a consumir${r.rot>1?'los':'lo'} para que no caduque${r.rot>1?'n':''}</button>`);
+  if(r.cad)al.push(`<button class="alert" data-go="cad">${r.cad} ${r.cad>1?'artículos caducan':'artículo caduca'} en 60 días o menos</button>`);
+  const red=S.items.filter(i=>redTxt(i)).length;
+  if(red)al.push(`<button class="alert" data-go="comprar">${red} ${red>1?'artículos ya no hacen falta (o hacen falta menos)':'artículo ya no hace falta (o hace falta menos)'} por lo que ya tienes</button>`);
+  const dr=S.respaldo?Math.floor((Date.now()-Date.parse(S.respaldo))/864e5):null;
+  if(S.items.some(i=>i.cant>0)&&(dr==null||dr>30))
+    al.push(`<button class="alert" data-go="ajustes">Haz un respaldo (${dr==null?'nunca has respaldado':'el último fue hace '+dr+' días'})</button>`);
+  $('#sum').innerHTML=`<div class="hrow"><h1>Reserva 4 semanas · 1 adulto + 1 niño</h1><button class="btn sm" id="refresh">↻ Actualizar</button></div>
+    <div class="big"><span class="n ${cl(ready)}">${nf(Math.min(ready,999),0)}</span><span class="t">de ${nf(D,0)} días cubiertos</span></div>
+    <div class="lim">${ready>=D?'Agua, comida y gas completos para la meta.':'Lo que menos alcanza: <b>'+min[0].toLowerCase()+'</b>.'}</div>
+    <div class="pills">${parts.map(([k,v])=>`<div class="pill"><small>${k}</small><b class="${cl(v)}">${nf(Math.floor(v),0)} d</b></div>`).join('')}</div>
+    <div class="money"><span>Valor hoy <b>${money(r.hoy)}</b></span><span>Valor sem. 4 <b>${money(r.s4)}</b></span><span>Falta comprar ≈ <b>${money(r.falta)}</b></span></div>
+    ${al.length?`<div class="alerts">${al.join('')}</div>`:''}`;
+}
+
+const CITAS=[
+  ['Todo saldrá bien al final. Si no está bien, no es el final.','Atribuida a John Lennon'],
+  ['Esto también pasará.','Proverbio persa'],
+  ['Hoy es el mañana que tanto te preocupaba ayer.','Dale Carnegie'],
+  ['Todo estará bien, y toda clase de cosas estarán bien.','Juliana de Norwich'],
+  ['Sufrimos más en la imaginación que en la realidad.','Séneca'],
+  ['Preocuparse no le quita al mañana su pena; le quita al hoy su fuerza.','Corrie ten Boom'],
+  ['Haz lo que puedas, con lo que tengas, donde estés.','Theodore Roosevelt'],
+  ['No hay mal que dure cien años.','Refrán popular'],
+  ['Después de la tormenta siempre llega la calma.','Refrán popular'],
+  ['Más vale prevenir que lamentar.','Refrán popular'],
+];
+let cita=Math.floor(Math.random()*CITAS.length);
+function renderCita(){const [t,a]=CITAS[cita];$('#cita').innerHTML=`“${esc(t)}”<small>${esc(a)} · toca para otra</small>`;}
+
+const TABS=[['inv','Inventario'],['comprar','Por comprar'],['trueque','Trueque'],['ajustes','Ajustes']];
+function renderTabs(){$('#tabs').innerHTML=TABS.map(([k,l])=>`<button data-tab="${k}" class="${S.ui.tab===k?'on':''}">${l}</button>`).join('');}
+
+/* ---------- Tarjetas ---------- */
+function quickForm(it){
+  const us=compat(it.unidad);
+  return `<form class="quick" data-id="${it.id}" autocomplete="off">
+    <input name="n" inputmode="decimal" placeholder="Cantidad" aria-label="Cantidad a sumar o restar">
+    ${us.length>1?`<select name="u" aria-label="Unidad">${us.map(u=>`<option ${u===it.unidad?'selected':''}>${u}</option>`).join('')}</select>`:`<span class="ulab">${esc(it.unidad)}</span>`}
+    <button class="b-add" data-op="+" aria-label="Sumar">+</button><button class="b-sub" data-op="-" aria-label="Restar">−</button>
+  </form>`;
+}
+const impTag=it=>`<span class="imp i${it.imp}">${IMP_L[it.imp]}</span>`;
+function cadTxt(it,c){
+  if(c.cad==null)return perecedero(it)?'<span>Sin fecha de caducidad</span>':'';
+  if(c.cad<0)return `<span class="bad">Caducó hace ${-c.cad} días</span>`;
+  const t=c.cad<=30?`<span class="bad">Caduca en ${c.cad} días</span>`
+    :c.cad<=90?`<span class="warn">Caduca en ${c.cad} días</span>`
+    :`<span>Caduca ${fDate(it.cad)}</span>`;
+  if(c.empieza==null)return t;
+  if(c.empieza<=0)return t+`<span class="bad">Empieza a consumirlo ya: tardas ~${c.rotD} días en usarlo</span>`;
+  if(c.empieza<=60)return t+`<span class="warn">Empieza a usarlo en ${c.empieza} días (tardas ~${c.rotD} días)</span>`;
+  return t+`<span>Empieza a usarlo ≈ ${enDias(c.empieza)}</span>`;
+}
+function card(it,c=calc(it)){
+  const D=S.ajustes.dias,ru=refU(it.unidad);
+  const pct=c.pct==null?null:Math.min(1,c.pct);
+  const pc=pct==null?'':pct>=1?'ok':pct>=.5?'warn':'bad';
+  const sub=[impTag(it),`<span>${esc(it.cat)}</span>`];
+  if(c.dias!=null)sub.push(`<span class="${c.dias>=D?'ok':c.dias>=D/2?'warn':'bad'}">${nf(Math.floor(c.dias),0)} de ${nf(D,0)} días</span>`);
+  sub.push(cadTxt(it,c));
+  if(it.upd)sub.push(`<span>Act. ${fAgo(it.upd)}</span>`);
+  sub.push(redTxt(it));
+  const val=it.unidad==='MXN'?`Efectivo: <b>${money(it.cant)}</b>`
+    :it.precio>0?`Sem. 4: <b>${pf(it.precio*it.mult)}/${ru}</b> (hoy ${pf(it.precio)} ×${nf(it.mult,1)}) · tienes ≈ <b>${money(c.s4)}</b>`
+    :'Sin valor de trueque';
+  return `<article class="item" data-card="${it.id}">
+    <div class="top"><h3>${esc(it.nombre)}</h3><button class="ed" data-edit="${it.id}">Editar</button></div>
+    <div class="sub">${sub.join('')}</div>
+    ${it.nota?`<div class="nota">${esc(it.nota)}</div>`:''}
+    <div class="qty"><strong>${fq(it.cant,it.unidad)}</strong>${it.meta>0?`<span class="mute">meta ${fq(it.meta,it.unidad)}</span>`:''}${pct>=1?'<span class="ok">✓ completo</span>':''}</div>
+    ${pct==null?'':`<div class="bar ${pc}"><i style="width:${(pct*100).toFixed(1)}%"></i></div>`}
+    <div class="val">${val}</div>
+    ${quickForm(it)}
+  </article>`;
+}
+function rowBuy(it){
+  const falta=faltaDe(it),cost=toRef(falta,it.unidad)*it.precio;
+  return `<article class="item" data-card="${it.id}">
+    <div class="top"><h3>${esc(it.nombre)}</h3><button class="ed" data-edit="${it.id}">Editar</button></div>
+    <div class="sub">${impTag(it)}<span>${esc(it.cat)}</span>${redTxt(it)}</div>
+    ${it.nota?`<div class="nota">${esc(it.nota)}</div>`:''}
+    <div class="qty">${falta>0
+      ?`<strong>Faltan ${fq(falta,it.unidad)}</strong><span class="mute">tienes ${fq(it.cant,it.unidad)} de ${fq(it.meta,it.unidad)}</span>${cost>0?`<span class="mute">≈ ${money(cost)}</span>`:''}`
+      :'<strong class="ok">✓ Completo</strong>'}</div>
+    ${quickForm(it)}
+  </article>`;
+}
+
+/* ---------- Pestañas ---------- */
+function renderInv(){
+  const vacio=!S.items.some(i=>i.cant>0);
+  $('#main').innerHTML=`
+    ${vacio?`<div class="card">Empieza anotando lo que ya tienes: escribe la cantidad en cada artículo y toca <b>+</b>. Las metas ya están calculadas para 1 adulto y 1 niño durante 28 días.</div>`:''}
+    <div class="tools">
+      <input id="q" class="full" type="search" placeholder="Buscar…" value="${esc(q)}">
+      <select id="fcat"><option value="">Todo</option>
+        <optgroup label="Importancia">${[[1,'Solo críticos'],[2,'Críticos y esenciales'],[3,'Sin los útiles']].map(([n,l])=>`<option value="imp:${n}" ${S.ui.cat==='imp:'+n?'selected':''}>${l}</option>`).join('')}</optgroup>
+        <optgroup label="Categoría">${allCats().map(c=>`<option ${c===S.ui.cat?'selected':''}>${esc(c)}</option>`).join('')}</optgroup></select>
+      <select id="fsort">${Object.entries(SORTS).map(([k,[l]])=>`<option value="${k}" ${k===S.ui.sort?'selected':''}>${l}</option>`).join('')}</select>
+      <button class="btn pri full" id="nuevo">+ Agregar artículo</button>
+    </div>
+    <div id="list"></div>`;
+  renderList();
+}
+function renderList(){
+  const t=norm(q.trim()),f=S.ui.cat,lvl=f.startsWith('imp:')?+f.slice(4):0;
+  const arr=S.items
+    .filter(i=>(!f||(lvl?i.imp<=lvl:i.cat===f))&&(!t||norm(i.nombre).includes(t)||norm(i.cat).includes(t)))
+    .map(it=>({it,c:calc(it)}));
+  arr.sort((SORTS[S.ui.sort]||SORTS.valor)[1]);
+  $('#list').innerHTML=arr.length?arr.map(x=>card(x.it,x.c)).join(''):'<p class="mute">Sin resultados.</p>';
+}
+function renderBuy(){
+  const falt=S.items.filter(i=>faltaDe(i)>1e-9);
+  const red=S.items.filter(i=>redTxt(i));
+  const sust=red.length?`<div class="card"><h2>Sustituciones</h2>${red.map(i=>`<p><b>${esc(i.nombre)}</b>: ${redTxt(i)}</p>`).join('')}
+      <p class="mute">Lo que ya tienes cubre parte de estas metas, así que se descontó de lo que falta comprar.</p></div>`:'';
+  if(!falt.length){$('#main').innerHTML='<div class="card">Todas las metas están completas.</div>'+sust;return;}
+  const cost=arr=>arr.reduce((s,i)=>s+toRef(faltaDe(i),i.unidad)*i.precio,0);
+  const groups={};
+  falt.forEach(i=>(groups[i.imp]=groups[i.imp]||[]).push(i));
+  $('#main').innerHTML=`<div class="card">Faltan <b>${falt.length}</b> artículos. Completar todas las metas cuesta ≈ <b>${money(cost(falt))}</b> a precios de hoy.
+      <p class="mute">Ordenado por importancia: completa primero lo crítico. Anota aquí lo que compres.</p></div>`+sust+
+    Object.keys(groups).sort().map(k=>`<h2>${IMP_L[k]} · ≈ ${money(cost(groups[k]))}</h2>`+
+      groups[k].sort((a,b)=>catIx(a.cat)-catIx(b.cat)||a.nombre.localeCompare(b.nombre,'es')).map(rowBuy).join('')).join('');
+}
+function renderTrade(){
+  const opts=S.items.filter(i=>i.precio*i.mult>0).sort((a,b)=>a.nombre.localeCompare(b.nombre,'es'));
+  if(opts.length<2){$('#main').innerHTML='<div class="card">Necesitas al menos dos artículos con precio para comparar.</div>';return;}
+  const a=opts.find(i=>i.id===S.ui.tA)||opts.find(i=>i.id==='arroz')||opts[0];
+  const b=opts.find(i=>i.id===S.ui.tB)||opts.find(i=>i.id==='agua')||opts[1];
+  const opt=sel=>opts.map(o=>`<option value="${o.id}" ${o===sel?'selected':''}>${esc(o.nombre)}</option>`).join('');
+  const surplus=S.items.map(i=>({i,x:i.cant-i.meta})).filter(o=>o.x>0&&o.i.precio>0)
+    .map(o=>({...o,v:toRef(o.x,o.i.unidad)*o.i.precio*o.i.mult})).sort((p,r)=>r.v-p.v);
+  $('#main').innerHTML=`<div class="card">
+      <div class="fgrid tight">
+        <label class="full">Yo doy<select id="tA">${opt(a)}</select></label>
+        <label>Cantidad<input id="tN" inputmode="decimal" value="${esc(S.ui.tN||'1')}"></label>
+        <label>Unidad<select id="tU"></select></label>
+        <label class="full">A cambio de<select id="tB">${opt(b)}</select></label>
+      </div>
+      <div id="tRes"></div>
+    </div>
+    <h2>Lo que te sobra arriba de tu meta</h2>
+    ${surplus.length?surplus.map(o=>`<div class="exc"><span>${esc(o.i.nombre)}: ${fq(o.x,o.i.unidad)}</span><b>≈ ${money(o.v)}</b></div>`).join('')
+      :'<p class="mute">Nada todavía. Cambia solo lo que tengas por encima de tu meta de 4 semanas.</p>'}`;
+  fillTU();calcTrade();
+}
+function fillTU(){
+  const a=byId($('#tA').value);
+  $('#tU').innerHTML=compat(a.unidad).map(u=>`<option ${u===a.unidad?'selected':''}>${u}</option>`).join('');
+}
+function calcTrade(){
+  const a=byId($('#tA').value),b=byId($('#tB').value);
+  S.ui.tA=a.id;S.ui.tB=b.id;S.ui.tN=$('#tN').value;save();
+  const n=parseFloat(($('#tN').value||'0').replace(',','.'))||0,u=$('#tU').value;
+  const qa=conv(n,u,a.unidad)??n;
+  const val=toRef(qa,a.unidad)*a.precio*a.mult;
+  const perB=toRef(1,b.unidad)*b.precio*b.mult;
+  const qb=perB>0?val/perB:0;
+  const sobra=a.cant-a.meta;
+  let aviso='';
+  if(a.meta>0)aviso=qa>sobra
+    ?`<p class="warn">Ojo: este cambio te deja por debajo de tu meta de ${esc(a.nombre)} (te ${sobra>0?'sobran solo '+fq(sobra,a.unidad):'no sobra nada'}).</p>`
+    :`<p class="ok">Te sobran ${fq(sobra,a.unidad)} arriba de tu meta.</p>`;
+  $('#tRes').innerHTML=`<p class="tr">${fq(n,u)} de ${esc(a.nombre)} ≈ <b>${fq(qb,b.unidad)}</b> de ${esc(b.nombre)}</p>
+    <p class="mute">Valor estimado en la semana 4: ${money(val)}. ${esc(a.nombre)} ${pf(a.precio*a.mult)}/${refU(a.unidad)} · ${esc(b.nombre)} ${pf(b.precio*b.mult)}/${refU(b.unidad)}.</p>${aviso}`;
+}
+function renderSet(){
+  const A=S.ajustes;
+  $('#main').innerHTML=`<div class="card"><h2>Necesidades del hogar</h2>
+      <div class="fgrid tight">
+        <label>Kcal por día (hogar)<input data-aj="kcal" type="number" step="any" inputmode="decimal" value="${A.kcal}"></label>
+        <label>Agua potable (L por día)<input data-aj="agua" type="number" step="any" inputmode="decimal" value="${A.agua}"></label>
+        <label>Días objetivo<input data-aj="dias" type="number" step="1" inputmode="numeric" value="${A.dias}"></label>
+      </div>
+      <p class="mute">Adulto ≈ 2,400 kcal + niño de 6 años ≈ 1,500 kcal, con menos actividad ≈ 3,600. Agua: 3 L adulto + 1.5 L niño + cocina ≈ 5 L.</p></div>
+    <div class="card"><h2>Respaldo</h2>
+      <p>Último respaldo: <b>${S.respaldo?fDate(S.respaldo.slice(0,10)):'nunca'}</b></p>
+      <div class="row"><button class="btn pri" id="exp">Exportar JSON</button><button class="btn" id="merge">Agregar desde archivo</button><button class="btn" id="imp">Restaurar respaldo</button></div>
+      <p class="mute">Guarda el archivo fuera del teléfono (correo, Drive o una memoria). "Agregar desde archivo" suma artículos nuevos y actualiza los que ya existen sin borrar nada. "Restaurar respaldo" reemplaza todo el inventario.</p></div>
+    <div class="card"><h2>Lista sugerida</h2>
+      <div class="row"><button class="btn" id="seed">Agregar sugeridos que falten</button><button class="btn dan" id="reset">Reiniciar todo</button></div>
+      <p class="mute">"Reiniciar" vuelve a la lista sugerida con todas las cantidades en cero.</p></div>
+    <div class="card"><h2>Sustitutos</h2>
+      ${GRUPOS.map(g=>`<p><b>${g.nombre}</b>: ${Object.keys(g.m).map(byId).filter(Boolean).map(i=>esc(i.nombre)).join(' · ')}<br><span class="mute">${g.txt}</span></p>`).join('')}
+      <p class="mute">Si tienes de más de uno, se descuenta lo que falta del otro en "Por comprar".</p></div>
+    <div class="card"><h2>Cómo se estima el valor</h2>
+      <p class="mute">Valor sem. 4 = precio de hoy × multiplicador de escasez. Los multiplicadores son estimaciones para una ciudad sin luz, agua ni gas durante 4 semanas: sube más lo que se agota primero y no se puede producir en casa (agua potable, gas, pilas, medicinas, café, azúcar); las herramientas duraderas suben menos y el efectivo conserva su valor nominal. Puedes cambiar precio y multiplicador de cualquier artículo en Editar.</p></div>`;
+}
+function render(){
+  SUBS=null;
+  renderSum();renderTabs();
+  ({inv:renderInv,comprar:renderBuy,trueque:renderTrade,ajustes:renderSet}[S.ui.tab]||renderInv)();
+}
+function refresh(...ids){
+  renderSum();
+  for(const id of ids){
+    const it=byId(id);if(!it)continue;
+    document.querySelectorAll(`[data-card="${id}"]`).forEach(el=>{el.outerHTML=S.ui.tab==='comprar'?rowBuy(it):card(it);});
+  }
+}
+
+/* ---------- Sumar / restar ---------- */
+function parse(raw,selU,itemU){
+  const s=raw.replace(/,(?=\d{3}(\D|$))/g,'').replace(',','.').replace(/\s+/g,' ').trim();
+  const m=s.match(/^([+\-−])?\s*(\d*\.?\d+)\s*([a-zA-ZÀ-ÿ]*)$/);
+  if(!m)return {err:'No entendí. Ejemplos: 200 · -1.5 kg · +2 latas'};
+  let n=parseFloat(m[2]);
+  if(m[1]==='-'||m[1]==='−')n=-n;
+  let u=selU;
+  if(m[3]){u=ALIAS[norm(m[3])];if(!u)return {err:`Unidad desconocida: "${m[3]}"`};}
+  const d=conv(n,u,itemU);
+  if(d===null)return {err:`No se puede convertir ${u} a ${itemU}`};
+  return {d};
+}
+function quick(f,op){
+  const it=byId(f.dataset.id);if(!it)return;
+  const raw=f.n.value.trim();
+  if(!raw){f.n.focus();return;}
+  const p=parse(raw,f.u?f.u.value:it.unidad,it.unidad);
+  if(p.err){toast(p.err);return;}
+  const d=op==='-'?-Math.abs(p.d):p.d;
+  const prev=it.cant,prevUpd=it.upd,antes=sub().porItem;
+  let nv=r6(prev+d),extra='';
+  if(nv<0){nv=0;extra=' (no puede quedar en negativo)';}
+  it.cant=nv;it.upd=Date.now();save();
+  // ¿Este cambio hizo que un sustituto haga falta menos (o más)?
+  const desp=sub().porItem;
+  const otros=Object.keys(desp).filter(id=>id!==it.id&&antes[id]);
+  const menos=otros.filter(id=>desp[id].ef<antes[id].ef-1e-9),mas=otros.filter(id=>desp[id].ef>antes[id].ef+1e-9);
+  const nom=ids=>ids.map(id=>byId(id).nombre).join(', ');
+  if(menos.length)extra+=`. Ahora necesitas menos: ${nom(menos)}`;
+  if(mas.length)extra+=`. Ahora te falta más: ${nom(mas)}`;
+  refresh(it.id,...menos,...mas);
+  toast(`${it.nombre}: ${d<0?'−':'+'}${fq(Math.abs(d),it.unidad)} → ${fq(nv,it.unidad)}${extra}`,()=>{it.cant=prev;it.upd=prevUpd;save();refresh(it.id,...menos,...mas);});
+}
+
+/* ---------- Editar ---------- */
+const FIELDS=['nombre','cat','imp','unidad','cant','meta','diario','uso','precio','mult','kcal','rol','nota','cad'];
+function openEdit(id){
+  const cat=S.ui.cat&&!S.ui.cat.startsWith('imp:')?S.ui.cat:'Comida';
+  const it=id?byId(id):{nombre:'',cat,imp:3,unidad:'pz',cant:0,meta:0,diario:0,uso:0,precio:0,mult:2,kcal:0,rol:'',nota:'',cad:''};
+  editing=id||null;
+  const f=$('#fe');
+  $('#dlgT').textContent=id?'Editar artículo':'Nuevo artículo';
+  $('#del').hidden=!id;
+  f.unidad.innerHTML=Object.keys(UNITS).map(u=>`<option>${u}</option>`).join('');
+  $('#catlist').innerHTML=allCats().map(c=>`<option value="${esc(c)}">`).join('');
+  FIELDS.forEach(k=>f[k].value=it[k]);
+  f.unidad.dataset.prev=it.unidad;
+  dlgLabels();
+  $('#dlg').showModal();
+}
+function dlgLabels(){
+  const f=$('#fe'),ru=refU(f.unidad.value);
+  $('[data-ru="precio"]').textContent=`($ por ${ru})`;
+  $('[data-ru="kcal"]').textContent=`por ${ru}`;
+  const v=(parseFloat(f.precio.value)||0)*(parseFloat(f.mult.value)||0);
+  $('#v4').textContent=`Valor estimado en la semana 4: ${pf(v)} por ${ru}`;
+}
+function dlgUnit(){
+  const f=$('#fe'),a=f.unidad.dataset.prev,b=f.unidad.value;
+  for(const k of ['cant','meta','diario','uso']){
+    const v=parseFloat(f[k].value),c=conv(v,a,b);
+    if(Number.isFinite(v)&&c!==null)f[k].value=r6(c);
+  }
+  f.unidad.dataset.prev=b;dlgLabels();
+}
+$('#fe').addEventListener('submit',e=>{
+  e.preventDefault();
+  const f=e.target,num=k=>{const v=parseFloat(f[k].value);return Number.isFinite(v)?Math.max(0,v):0;};
+  const nombre=f.nombre.value.trim();if(!nombre)return;
+  const data={nombre,cat:f.cat.value.trim()||'Otros',imp:impOf(f.imp.value),unidad:f.unidad.value,cant:num('cant'),meta:num('meta'),diario:num('diario'),uso:num('uso'),
+    precio:num('precio'),mult:num('mult'),kcal:num('kcal'),rol:f.rol.value,nota:f.nota.value.trim(),cad:f.cad.value,upd:Date.now()};
+  if(editing)Object.assign(byId(editing),data);else S.items.push({id:uid(),...data});
+  save();$('#dlg').close();render();
+});
+
+/* ---------- Respaldo ---------- */
+async function exportar(){
+  const when=new Date().toISOString();
+  const name=`reserva-4-semanas-${when.slice(0,10)}.json`;
+  const data=JSON.stringify({app:'reserva4s',v:1,exportado:when,ajustes:S.ajustes,items:S.items},null,2);
+  const file=new File([data],name,{type:'application/json'});
+  const done=()=>{S.respaldo=when;save();render();toast('Respaldo exportado');};
+  if(matchMedia('(pointer:coarse)').matches&&navigator.canShare&&navigator.canShare({files:[file]})){
+    try{await navigator.share({files:[file],title:name});done();return;}
+    catch(e){if(e.name==='AbortError')return;}
+  }
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(file);a.download=name;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+  done();
+}
+$('#file').addEventListener('change',async e=>{
+  const file=e.target.files[0];e.target.value='';
+  if(!file)return;
+  let d;
+  try{d=JSON.parse(await file.text());if(!Array.isArray(d.items))throw 0;}
+  catch(err){toast('El archivo no es un respaldo válido');return;}
+  if(importMode==='merge'){
+    const raws=d.items.filter(i=>i&&(i.nombre||i.id&&byId(String(i.id))));
+    if(!raws.length){toast('El archivo no trae artículos');return;}
+    if(!confirm(`¿Agregar ${raws.length} artículo(s) a tu inventario? Los que ya existen se actualizan.`))return;
+    let nuevos=0,act=0;
+    for(const raw of raws){
+      const ex=raw.id&&byId(String(raw.id));
+      if(ex){Object.assign(ex,cleanItem({...ex,...raw,upd:Date.now()}));act++;}
+      else{S.items.push(cleanItem({...raw,upd:Date.now()}));nuevos++;}
+    }
+    save();render();toast(`${nuevos} agregado(s), ${act} actualizado(s)`);
+    return;
+  }
+  const items=d.items.filter(i=>i&&i.nombre).map(cleanItem);
+  if(!confirm(`¿Reemplazar el inventario actual (${S.items.length} artículos) con el respaldo (${items.length} artículos)?`))return;
+  S.items=items;S.ajustes=cleanAjustes(d.ajustes,S.ajustes);
+  save();render();toast('Respaldo importado');
+});
+
+/* ---------- Eventos ---------- */
+let tt;
+function toast(msg,undo){
+  const el=$('#toast');
+  el.innerHTML=`<span>${esc(msg)}</span>${undo?'<button class="btn sm" id="undo">Deshacer</button>':''}`;
+  el.hidden=false;clearTimeout(tt);
+  if(undo)$('#undo').onclick=()=>{undo();el.hidden=true;};
+  tt=setTimeout(()=>el.hidden=true,5000);
+}
+document.addEventListener('submit',e=>{
+  const f=e.target;if(!f.classList.contains('quick'))return;
+  e.preventDefault();
+  quick(f,(e.submitter&&e.submitter.dataset.op)||'+');
+});
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t)return;
+  if(t.dataset.tab){S.ui.tab=t.dataset.tab;save();render();return;}
+  if(t.dataset.edit){openEdit(t.dataset.edit);return;}
+  if(t.dataset.go){
+    if(SORTS[t.dataset.go]){S.ui.tab='inv';S.ui.sort=t.dataset.go;S.ui.cat='';q='';}
+    else S.ui.tab=t.dataset.go;
+    save();render();return;
+  }
+  switch(t.id){
+    case 'cita':cita=(cita+1)%CITAS.length;renderCita();break;
+    case 'refresh':recargar();break;
+    case 'nuevo':openEdit(null);break;
+    case 'cancel':$('#dlg').close();break;
+    case 'del':{
+      const it=byId(editing);
+      if(it&&confirm(`¿Eliminar "${it.nombre}"?`)){S.items=S.items.filter(i=>i!==it);save();$('#dlg').close();render();}
+      break;
+    }
+    case 'exp':exportar();break;
+    case 'imp':case 'merge':importMode=t.id;$('#file').click();break;
+    case 'seed':{
+      const have=new Set(S.items.map(i=>i.id));
+      const add=SEED.filter(s=>!have.has(s[0])).map(seedItem);
+      S.items.push(...add);save();render();
+      toast(add.length?`Se agregaron ${add.length} artículos`:'Ya tienes todos los sugeridos');
+      break;
+    }
+    case 'reset':
+      if(confirm('¿Borrar todo y volver a la lista sugerida con cantidades en cero?')){const r=S.respaldo;S=fresh();S.respaldo=r;S.aplicados=[...MIGRA,...MIO].map(e=>e.k);save();render();}
+      break;
+  }
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.id==='fcat'){S.ui.cat=t.value;save();renderList();}
+  else if(t.id==='fsort'){S.ui.sort=t.value;save();renderList();}
+  else if(t.dataset.aj){
+    const v=parseFloat(t.value);
+    if(v>0){S.ajustes[t.dataset.aj]=v;save();renderSum();}else t.value=S.ajustes[t.dataset.aj];
+  }
+  else if(t.id==='tA'){fillTU();calcTrade();}
+  else if(t.id==='tB'||t.id==='tU')calcTrade();
+  else if(t.name==='unidad'&&t.form&&t.form.id==='fe')dlgUnit();
+});
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.id==='q'){q=t.value;renderList();}
+  else if(t.id==='tN')calcTrade();
+  else if(t.form&&t.form.id==='fe')dlgLabels();
+});
+
+// Recarga la página completa: así entra la versión más nueva de la app (y los cambios de MIO/MIGRA),
+// y los datos se vuelven a leer del almacenamiento.
+function recargar(){
+  try{sessionStorage.setItem('reserva4s.recargado','1');}catch(e){}
+  location.reload();
+}
+window.addEventListener('storage',e=>{if(e.key===KEY){const s=load();if(s){S=s;render();}}});
+
+render();renderCita();
+try{if(sessionStorage.getItem('reserva4s.recargado')){sessionStorage.removeItem('reserva4s.recargado');toast('App y datos actualizados');}}catch(e){}
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
