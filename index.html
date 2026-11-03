@@ -325,14 +325,36 @@ function aplicarMio(s){
     SEED.filter(r=>agregar.includes(r[0])&&!have.has(r[0])).forEach(r=>s.items.push(seedItem(r)));
     s.aplicados.push(k);n++;
   }
-  for(const {k,...raw} of MIO){
-    if(s.aplicados.includes(k))continue;
+  return n+aplicarEntradas(s,MIO);
+}
+// Aplica entradas {k, id, ...campos} una sola vez cada una (por su clave "k").
+function aplicarEntradas(s,lista){
+  s.aplicados=s.aplicados||[];
+  let n=0;
+  for(const {k,...raw} of lista){
+    if(!k||s.aplicados.includes(k))continue;
     const ex=s.items.find(i=>i.id===raw.id);
     if(ex)Object.assign(ex,cleanItem({...ex,...raw,upd:Date.now()}));
-    else s.items.push(cleanItem({...raw,upd:Date.now()}));
+    else if(raw.nombre)s.items.push(cleanItem({...raw,upd:Date.now()}));
+    else continue;
     s.aplicados.push(k);n++;
   }
   return n;
+}
+// Sincronización: un JSON privado (gist secreto) con {entradas:[...]}. El enlace vive solo en este
+// dispositivo, nunca en el código. Se lee al abrir la app y al tocar Actualizar; sin conexión no pasa nada.
+async function sincronizar(){
+  if(!S.sync)return;
+  try{
+    const r=await fetch(S.sync+(S.sync.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'});
+    if(!r.ok)throw new Error(r.status);
+    const d=await r.json();
+    const n=aplicarEntradas(S,Array.isArray(d.entradas)?d.entradas:[]);
+    S.syncOk=new Date().toISOString();
+    save();
+    if(n){render();toast(`${n} ${n>1?'cambios nuevos sincronizados':'cambio nuevo sincronizado'}`);}
+    else if(S.ui.tab==='ajustes')renderSet();
+  }catch(e){}
 }
 // Sustitutos: artículos que cubren la misma necesidad. "m" da cuánto cubre cada uno por unidad de referencia
 // (kg, L o pieza); 'kcal' compara por calorías. "nec" es la necesidad total del grupo; si no se da, es la suma de las metas.
@@ -643,6 +665,9 @@ function renderSet(){
         <label>Días objetivo<input data-aj="dias" type="number" step="1" inputmode="numeric" value="${A.dias}"></label>
       </div>
       <p class="mute">Adulto ≈ 2,400 kcal + niño de 6 años ≈ 1,500 kcal, con menos actividad ≈ 3,600. Agua: 3 L adulto + 1.5 L niño + cocina ≈ 5 L.</p></div>
+    <div class="card"><h2>Sincronización</h2>
+      <div class="fgrid tight"><label class="full">Enlace privado<input id="syncUrl" type="url" value="${esc(S.sync||'')}" placeholder="https://gist.githubusercontent.com/…"></label></div>
+      <p class="mute">${S.sync?`Última sincronización: <b>${S.syncOk?fAgo(Date.parse(S.syncOk)):'todavía no'}</b>. `:''}Lo que le digas a Claude que tienes aparece al abrir la app o tocar ↻ Actualizar. No compartas este enlace.</p></div>
     <div class="card"><h2>Respaldo</h2>
       <p>Último respaldo: <b>${S.respaldo?fDate(S.respaldo.slice(0,10)):'nunca'}</b></p>
       <div class="row"><button class="btn pri" id="exp">Exportar JSON</button><button class="btn" id="merge">Agregar desde archivo</button><button class="btn" id="imp">Restaurar respaldo</button></div>
@@ -830,7 +855,7 @@ document.addEventListener('click',e=>{
       break;
     }
     case 'reset':
-      if(confirm('¿Borrar todo y volver a la lista sugerida con cantidades en cero?')){const r=S.respaldo;S=fresh();S.respaldo=r;S.aplicados=[...MIGRA,...MIO].map(e=>e.k);save();render();}
+      if(confirm('¿Borrar todo y volver a la lista sugerida con cantidades en cero?')){const r=S.respaldo,sy=S.sync;S=fresh();S.respaldo=r;S.sync=sy;S.aplicados=[...MIGRA,...MIO].map(e=>e.k);save();render();}
       break;
   }
 });
@@ -841,6 +866,12 @@ document.addEventListener('change',e=>{
   else if(t.dataset.aj){
     const v=parseFloat(t.value);
     if(v>0){S.ajustes[t.dataset.aj]=v;save();renderSum();}else t.value=S.ajustes[t.dataset.aj];
+  }
+  else if(t.id==='syncUrl'){
+    const v=t.value.trim();
+    if(v&&!/^https:\/\//.test(v)){toast('El enlace debe empezar con https://');t.value=S.sync||'';return;}
+    S.sync=v;S.syncOk=null;save();renderSet();
+    if(v){toast('Sincronizando…');sincronizar();}
   }
   else if(t.id==='tA'){fillTU();calcTrade();}
   else if(t.id==='tB'||t.id==='tU')calcTrade();
@@ -861,7 +892,14 @@ function recargar(){
 }
 window.addEventListener('storage',e=>{if(e.key===KEY){const s=load();if(s){S=s;render();}}});
 
+// Abrir la app con #sync=<enlace> guarda el enlace de sincronización en este dispositivo y lo quita de la barra.
+if(location.hash.startsWith('#sync=')){
+  const v=decodeURIComponent(location.hash.slice(6));
+  if(/^https:\/\//.test(v)){S.sync=v;save();}
+  history.replaceState(null,'',location.pathname+location.search);
+}
 render();renderCita();
+sincronizar();
 try{if(sessionStorage.getItem('reserva4s.recargado')){sessionStorage.removeItem('reserva4s.recargado');toast('App y datos actualizados');}}catch(e){}
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))

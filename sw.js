@@ -1,7 +1,7 @@
 // Guarda la app en el teléfono para que abra sin internet.
 // La página se pide primero a la red (para que "Actualizar" traiga la versión nueva) y, si no hay
 // conexión en 3 s, se usa la copia guardada. El resto de archivos sale de la caché y se actualiza en segundo plano.
-const CACHE='reserva4s-v2';
+const CACHE='reserva4s-v3';
 const ASSETS=['./','./index.html','./manifest.webmanifest','./icon.svg'];
 
 self.addEventListener('install',e=>{
@@ -13,7 +13,8 @@ self.addEventListener('activate',e=>{
   self.clients.claim();
 });
 self.addEventListener('fetch',e=>{
-  if(e.request.method!=='GET')return;
+  // Solo los archivos de la app; lo de otros sitios (como el archivo de sincronización) va directo a la red.
+  if(e.request.method!=='GET'||new URL(e.request.url).origin!==location.origin)return;
   const put=res=>{
     if(res.ok){const copy=res.clone();caches.open(CACHE).then(c=>c.put(e.request,copy));}
     return res;
