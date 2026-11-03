@@ -445,10 +445,12 @@ function resumen(){
   const A=S.ajustes;let kcal=0,agua=0,gas=0,hoy=0,s4=0,falta=0,cad=0,venc=0,rot=0;
   for(const it of S.items){
     const c=calc(it);
-    kcal+=(TOPE_KCAL.has(it.id)?Math.min(c.q,toRef(it.meta,it.unidad)):c.q)*it.kcal;
+    // Lo caducado no cuenta para los días cubiertos: no se debe contar con ello en la emergencia.
+    const vigente=c.cad==null||c.cad>=0;
+    if(vigente)kcal+=(TOPE_KCAL.has(it.id)?Math.min(c.q,toRef(it.meta,it.unidad)):c.q)*it.kcal;
     if(it.cant>0&&c.empieza!=null&&c.empieza<=60&&c.cad>=0)rot++;
-    if(it.rol==='agua'&&dim(it.unidad)==='vol')agua+=c.q;
-    if(it.rol==='gas'&&c.dias!=null)gas+=c.dias;
+    if(vigente&&it.rol==='agua'&&dim(it.unidad)==='vol')agua+=c.q;
+    if(vigente&&it.rol==='gas'&&c.dias!=null)gas+=c.dias;
     hoy+=c.hoy;s4+=c.s4;
     falta+=toRef(faltaDe(it),it.unidad)*it.precio;
     if(it.cant>0&&c.cad!=null){if(c.cad<0)venc++;else if(c.cad<=60)cad++;}
