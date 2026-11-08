@@ -333,6 +333,8 @@ function aplicarEntradas(s,lista){
   let n=0;
   for(const {k,...raw} of lista){
     if(!k||s.aplicados.includes(k))continue;
+    // {id, quitar:true} borra ese renglón (p. ej. al juntar dos en uno).
+    if(raw.quitar){s.items=s.items.filter(i=>i.id!==raw.id);s.aplicados.push(k);n++;continue;}
     const ex=s.items.find(i=>i.id===raw.id);
     if(ex)Object.assign(ex,cleanItem({...ex,...raw,upd:Date.now()}));
     else if(raw.nombre)s.items.push(cleanItem({...raw,upd:Date.now()}));
