@@ -358,6 +358,41 @@ async function sincronizar(){
     else if(S.ui.tab==='ajustes')renderSet();
   }catch(e){}
 }
+// Envío a Claude: con una llave de GitHub (solo permiso de gists), cada cambio sube el inventario completo
+// al mismo gist como estado-<dispositivo>.json. La llave vive aparte de S, así nunca sale en un respaldo.
+const TOKEN_KEY='reserva4s.token',DEV_KEY='reserva4s.dispositivo',SUBIDA_KEY='reserva4s.subida';
+const lsGet=k=>{try{return localStorage.getItem(k)||'';}catch(e){return '';}};
+const lsSet=(k,v)=>{try{v?localStorage.setItem(k,v):localStorage.removeItem(k);}catch(e){}};
+function dispositivo(){
+  let d=lsGet(DEV_KEY);
+  if(!d){const ua=navigator.userAgent;d=(/Android/i.test(ua)?'android':/iPhone|iPad/i.test(ua)?'iphone':'pc')+'-'+Math.random().toString(36).slice(2,6);lsSet(DEV_KEY,d);}
+  return d;
+}
+const gistId=()=>((S.sync||'').match(/gist\.githubusercontent\.com\/[^/]+\/([0-9a-f]+)/)||[])[1];
+const subidaInfo=()=>{try{return JSON.parse(lsGet(SUBIDA_KEY))||{};}catch(e){return {};}};
+let subirT=null,ultimoSubido='';
+function programarSubida(){
+  if(!lsGet(TOKEN_KEY)||!gistId())return;
+  clearTimeout(subirT);subirT=setTimeout(subir,3000);
+}
+async function subir(keepalive){
+  clearTimeout(subirT);subirT=null;
+  const tok=lsGet(TOKEN_KEY),id=gistId();
+  if(!tok||!id)return;
+  const datos=JSON.stringify({ajustes:S.ajustes,aplicados:S.aplicados||[],items:S.items});
+  if(datos===ultimoSubido)return;
+  const content=`{"app":"reserva4s","dispositivo":"${dispositivo()}","subido":"${new Date().toISOString()}",${datos.slice(1)}`;
+  let info;
+  try{
+    const r=await fetch('https://api.github.com/gists/'+id,{method:'PATCH',keepalive:!!keepalive,
+      headers:{Authorization:'Bearer '+tok,Accept:'application/vnd.github+json','Content-Type':'application/json'},
+      body:JSON.stringify({files:{[`estado-${dispositivo()}.json`]:{content}}})});
+    if(r.ok){ultimoSubido=datos;info={ok:new Date().toISOString()};}
+    else info={...subidaInfo(),err:[401,403,404].includes(r.status)?'La llave no funciona: pega una nueva.':`GitHub respondió ${r.status}; se reintenta en el próximo cambio.`};
+  }catch(e){info={...subidaInfo(),err:'Sin conexión; se envía cuando vuelva.'};}
+  lsSet(SUBIDA_KEY,JSON.stringify(info));
+  if(S.ui.tab==='ajustes')renderSet();
+}
 // Sustitutos: artículos que cubren la misma necesidad. "m" da cuánto cubre cada uno por unidad de referencia
 // (kg, L o pieza); 'kcal' compara por calorías. "nec" es la necesidad total del grupo; si no se da, es la suma de las metas.
 // Lo que falta del grupo se reparte en el orden de "m": si el primero ya cubre todo, los demás ya no hacen falta.
@@ -421,7 +456,7 @@ function load(){
     return s;
   }catch(e){return null;}
 }
-function save(){SUBS=null;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){toast('No se pudo guardar en este navegador');}}
+function save(){SUBS=null;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){toast('No se pudo guardar en este navegador');}programarSubida();}
 
 let S=load()||fresh();
 if(aplicarMio(S))save();
@@ -669,7 +704,9 @@ function renderSet(){
       <p class="mute">Adulto ≈ 2,400 kcal + niño de 6 años ≈ 1,500 kcal, con menos actividad ≈ 3,600. Agua: 3 L adulto + 1.5 L niño + cocina ≈ 5 L.</p></div>
     <div class="card"><h2>Sincronización</h2>
       <div class="fgrid tight"><label class="full">Enlace privado<input id="syncUrl" type="url" value="${esc(S.sync||'')}" placeholder="https://gist.githubusercontent.com/…"></label></div>
-      <p class="mute">${S.sync?`Última sincronización: <b>${S.syncOk?fAgo(Date.parse(S.syncOk)):'todavía no'}</b>. `:''}Lo que le digas a Claude que tienes aparece al abrir la app o tocar ↻ Actualizar. No compartas este enlace.</p></div>
+      <p class="mute">${S.sync?`Última sincronización: <b>${S.syncOk?fAgo(Date.parse(S.syncOk)):'todavía no'}</b>. `:''}Lo que le digas a Claude que tienes aparece al abrir la app o tocar ↻ Actualizar. No compartas este enlace.</p>
+      <div class="fgrid tight"><label class="full">Llave de GitHub (para que Claude vea lo que cambias aquí)<input id="syncTok" type="password" autocomplete="off" spellcheck="false" placeholder="${lsGet(TOKEN_KEY)?'Guardada ✓ — pega otra para cambiarla':'ghp_…'}"></label></div>
+      ${(()=>{const s=subidaInfo();return lsGet(TOKEN_KEY)?`<p class="mute">${s.err?`<b>${esc(s.err)}</b> `:''}Último envío: <b>${s.ok?fAgo(Date.parse(s.ok)):'todavía no'}</b>. La llave se queda solo en este dispositivo y no sale en los respaldos.</p><div class="row"><button class="btn" id="tokDel">Quitar llave</button></div>`:'<p class="mute">Sin llave, lo que escribes aquí se queda solo en este navegador.</p>';})()}</div>
     <div class="card"><h2>Respaldo</h2>
       <p>Último respaldo: <b>${S.respaldo?fDate(S.respaldo.slice(0,10)):'nunca'}</b></p>
       <div class="row"><button class="btn pri" id="exp">Exportar JSON</button><button class="btn" id="merge">Agregar desde archivo</button><button class="btn" id="imp">Restaurar respaldo</button></div>
@@ -847,6 +884,7 @@ document.addEventListener('click',e=>{
       if(it&&confirm(`¿Eliminar "${it.nombre}"?`)){S.items=S.items.filter(i=>i!==it);save();$('#dlg').close();render();}
       break;
     }
+    case 'tokDel':if(confirm('¿Quitar la llave de este dispositivo?')){lsSet(TOKEN_KEY,'');lsSet(SUBIDA_KEY,'');renderSet();}break;
     case 'exp':exportar();break;
     case 'imp':case 'merge':importMode=t.id;$('#file').click();break;
     case 'seed':{
@@ -875,6 +913,14 @@ document.addEventListener('change',e=>{
     S.sync=v;S.syncOk=null;save();renderSet();
     if(v){toast('Sincronizando…');sincronizar();}
   }
+  else if(t.id==='syncTok'){
+    const v=t.value.trim();t.value='';
+    if(!v)return;
+    if(!/^(ghp_|github_pat_)\w+$/.test(v)){toast('La llave empieza con ghp_ o github_pat_');return;}
+    lsSet(TOKEN_KEY,v);lsSet(SUBIDA_KEY,'');ultimoSubido='';
+    if(!gistId()){toast('Llave guardada; falta el enlace privado de arriba');renderSet();return;}
+    toast('Llave guardada. Enviando…');subir();
+  }
   else if(t.id==='tA'){fillTU();calcTrade();}
   else if(t.id==='tB'||t.id==='tU')calcTrade();
   else if(t.name==='unidad'&&t.form&&t.form.id==='fe')dlgUnit();
@@ -901,7 +947,10 @@ if(location.hash.startsWith('#sync=')){
   history.replaceState(null,'',location.pathname+location.search);
 }
 render();renderCita();
-sincronizar();
+sincronizar().then(()=>subir());
+// Envía lo pendiente al volver la conexión o al cerrar/cambiar de app.
+window.addEventListener('online',()=>subir());
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&subirT)subir(true);});
 try{if(sessionStorage.getItem('reserva4s.recargado')){sessionStorage.removeItem('reserva4s.recargado');toast('App y datos actualizados');}}catch(e){}
 if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))
